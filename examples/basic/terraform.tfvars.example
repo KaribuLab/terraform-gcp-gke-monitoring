@@ -1,0 +1,17 @@
+#------------------------------------------------------------------------------
+# Ejemplo de variables para el ejemplo básico
+#------------------------------------------------------------------------------
+# Copia este archivo a terraform.tfvars y ajusta los valores.
+#------------------------------------------------------------------------------
+
+# ID del proyecto de GCP
+project_id = "mi-proyecto-gcp"
+
+# Nombre del cluster GKE a monitorear
+cluster_name = "mi-cluster-prod"
+
+# Ubicación del cluster (zona o región)
+cluster_location = "us-central1"
+
+# Email para notificaciones (opcional, puede dejarse vacío)
+notification_email = "devops@miempresa.com"

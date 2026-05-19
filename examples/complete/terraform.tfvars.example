@@ -1,0 +1,34 @@
+#------------------------------------------------------------------------------
+# Ejemplo de variables para el ejemplo completo
+#------------------------------------------------------------------------------
+# Copia este archivo a terraform.tfvars y ajusta los valores.
+# Incluye configuración para todos los tipos de notificación.
+#------------------------------------------------------------------------------
+
+# ID del proyecto de GCP
+project_id = "mi-proyecto-prod"
+
+# Nombre y ubicación del cluster GKE
+cluster_name     = "production-cluster"
+cluster_location = "us-central1"
+
+# Namespace específico a monitorear (vacío para todo el cluster)
+namespace_filter = ""
+
+#------------------------------------------------------------------------------
+# Canales de notificación
+#------------------------------------------------------------------------------
+
+# Slack (opcional)
+slack_channel  = "#gke-alerts"
+slack_auth_token = "xoxb-your-slack-bot-token-here"
+
+# PagerDuty (opcional)
+pagerduty_service_key = "your-pagerduty-service-key-here"
+
+#------------------------------------------------------------------------------
+# Uptime checks
+#------------------------------------------------------------------------------
+
+# Hostname para monitoreo de uptime (opcional)
+uptime_check_host = "api.miapp.com"
