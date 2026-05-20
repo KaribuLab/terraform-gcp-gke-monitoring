@@ -28,14 +28,22 @@ locals {
   # Filtro de namespace para los widgets (vacío = todos)
   namespace_clause = var.namespace_filter != "" ? " AND resource.labels.namespace_name = \"${var.namespace_filter}\"" : ""
 
-  # Variables para el template
+  # Parte común del filtro de Monitoring (sintaxis con comillas; jsonencode() en template_vars evita JSON inválido al interpolar)
+  cluster_name_filter = "resource.labels.cluster_name = \"${var.cluster_name}\""
+
+  filter_k8s_container_ns = "resource.type=\"k8s_container\" AND ${local.cluster_name_filter}${local.namespace_clause}"
+  filter_k8s_node         = "resource.type=\"k8s_node\" AND ${local.cluster_name_filter}"
+  filter_k8s_pod_ns       = "resource.type=\"k8s_pod\" AND ${local.cluster_name_filter}${local.namespace_clause}"
+
+  # Variables para el template: *_json son literales JSON (incluyen comillas y escapes) para usar como "filter": ${filter_..._json}
   template_vars = {
-    project_id       = var.project_id
-    cluster_name     = var.cluster_name
-    dashboard_title  = local.dashboard_title
-    namespace_filter = var.namespace_filter
-    namespace_clause = local.namespace_clause
-    cluster_filter   = "resource.labels.cluster_name = \"${var.cluster_name}\""
+    dashboard_title     = local.dashboard_title
+    filter_cpu_json     = jsonencode("${local.filter_k8s_container_ns} AND metric.type=\"kubernetes.io/container/cpu/limit_utilization\"")
+    filter_memory_json  = jsonencode("${local.filter_k8s_container_ns} AND metric.type=\"kubernetes.io/container/memory/limit_utilization\"")
+    filter_restart_json = jsonencode("${local.filter_k8s_container_ns} AND metric.type=\"kubernetes.io/container/restart_count\"")
+    filter_disk_json    = jsonencode("${local.filter_k8s_node} AND metric.type=\"kubernetes.io/node/ephemeral_storage/used_bytes\"")
+    filter_pv_json      = jsonencode("${local.filter_k8s_pod_ns} AND metric.type=\"kubernetes.io/pod/volume/utilization\"")
+    filter_uptime_json  = jsonencode("${local.filter_k8s_container_ns} AND metric.type=\"kubernetes.io/container/uptime\"")
   }
 }
 

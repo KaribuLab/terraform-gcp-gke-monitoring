@@ -10,7 +10,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_container\" AND ${cluster_filter}${namespace_clause} AND metric.type=\"kubernetes.io/container/cpu/limit_utilization\"",
+                  "filter": ${filter_cpu_json},
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "perSeriesAligner": "ALIGN_MEAN"
@@ -39,7 +39,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_container\" AND ${cluster_filter}${namespace_clause} AND metric.type=\"kubernetes.io/container/memory/limit_utilization\"",
+                  "filter": ${filter_memory_json},
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "perSeriesAligner": "ALIGN_MEAN"
@@ -68,7 +68,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_container\" AND ${cluster_filter}${namespace_clause} AND metric.type=\"kubernetes.io/container/restart_count\"",
+                  "filter": ${filter_restart_json},
                   "aggregation": {
                     "alignmentPeriod": "600s",
                     "perSeriesAligner": "ALIGN_DELTA"
@@ -97,7 +97,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_node\" AND ${cluster_filter} AND metric.type=\"kubernetes.io/node/ephemeral_storage/used_bytes\"",
+                  "filter": ${filter_disk_json},
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "perSeriesAligner": "ALIGN_MEAN"
@@ -126,7 +126,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_pod\" AND ${cluster_filter}${namespace_clause} AND metric.type=\"kubernetes.io/pod/volume/utilization\"",
+                  "filter": ${filter_pv_json},
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "perSeriesAligner": "ALIGN_MEAN"
@@ -155,7 +155,7 @@
             {
               "timeSeriesQuery": {
                 "timeSeriesFilter": {
-                  "filter": "resource.type=\"k8s_container\" AND ${cluster_filter}${namespace_clause} AND metric.type=\"kubernetes.io/container/uptime\"",
+                  "filter": ${filter_uptime_json},
                   "aggregation": {
                     "alignmentPeriod": "60s",
                     "perSeriesAligner": "ALIGN_MEAN"

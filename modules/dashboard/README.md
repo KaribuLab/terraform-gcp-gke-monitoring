@@ -17,16 +17,21 @@ Crea un dashboard de Cloud Monitoring para visualización de métricas GKE.
 
 El dashboard se genera usando `templatefile()` con un template JSON ubicado en `templates/gke_dashboard.json.tpl`.
 
-Las siguientes variables se sustituyen en el template:
+Los filtros de cada widget se construyen en `locals` del módulo y se pasan al template con `jsonencode()`, de modo que las comillas de la sintaxis de Monitoring no rompan el JSON (no se interpolan strings con comillas dentro de otro string JSON a mano).
 
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `project_id` | ID del proyecto | `my-project` |
-| `cluster_name` | Nombre del cluster | `production-cluster` |
-| `dashboard_title` | Título del dashboard | `GKE production-cluster (us-central1)` |
-| `namespace_filter` | Namespace filtrado (si aplica) | `production` o `""` |
-| `namespace_clause` | Cláusula AND para filtros | ` AND resource.labels.namespace_name = "production"` |
-| `cluster_filter` | Filtro base del cluster | `resource.labels.cluster_name = "production-cluster"` |
+Variables sustituidas en el template:
+
+| Variable | Descripción |
+|----------|-------------|
+| `dashboard_title` | Título del dashboard |
+| `filter_cpu_json` | Literal JSON (string codificado) del filtro CPU |
+| `filter_memory_json` | Idem memoria |
+| `filter_restart_json` | Idem reinicios |
+| `filter_disk_json` | Idem disco en nodos |
+| `filter_pv_json` | Idem PersistentVolume |
+| `filter_uptime_json` | Idem uptime |
+
+Los inputs del módulo (`project_id`, `cluster_name`, `cluster_location`, `namespace_filter`) siguen usándose solo en `main.tf` para armar esos valores.
 
 ## Uso
 
