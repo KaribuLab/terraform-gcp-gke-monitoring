@@ -100,15 +100,16 @@ locals {
   #------------------------------------------------------------------------------
   node_disk_mql = <<-EOT
     fetch k8s_node
-    | metric 'kubernetes.io/node/ephemeral_storage/used_bytes'
-    | group_by [resource.cluster_name, resource.node_name], [used: mean(value.used_bytes)]
+    | filter (resource.cluster_name == '${var.cluster_name}')
     | {
-        fetch k8s_node
-        | metric 'kubernetes.io/node/ephemeral_storage/total_bytes'
-        | group_by [resource.cluster_name, resource.node_name], [total: mean(value.total_bytes)]
+        metric 'kubernetes.io/node/ephemeral_storage/used_bytes'
+        | group_by [resource.cluster_name, resource.node_name], [value_used: mean(value.used_bytes)]
+      ;
+        metric 'kubernetes.io/node/ephemeral_storage/total_bytes'
+        | group_by [resource.cluster_name, resource.node_name], [value_total: mean(value.total_bytes)]
     }
     | join
-    | value val(0) / val(1)
+    | div
     | condition val() > ${var.thresholds.node_disk_utilization}
   EOT
 
@@ -204,13 +205,15 @@ locals {
 
     var.enable_node_not_ready_alert ? {
       node_not_ready = {
-        display_name = "GKE ${var.cluster_name}: Node NotReady"
-        filter       = local.node_not_ready_filter
-        metric_type  = local.node_status_metric_type
-        threshold    = 0
-        duration     = "300s"
-        comparison   = "COMPARISON_GT"
-        description  = "Node has been in NotReady state for more than 5 minutes"
+        display_name     = "GKE ${var.cluster_name}: Node NotReady"
+        filter           = local.node_not_ready_filter
+        metric_type      = local.node_status_metric_type
+        threshold        = 0
+        duration         = "300s"
+        comparison       = "COMPARISON_GT"
+        alignment_period = "60s"
+        aligner          = "ALIGN_NEXT_OLDER"
+        description      = "Node has been in NotReady state for more than 5 minutes"
       }
     } : {}
   )

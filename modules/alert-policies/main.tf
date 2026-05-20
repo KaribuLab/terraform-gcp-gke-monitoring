@@ -103,21 +103,7 @@ resource "google_monitoring_alert_policy" "node_disk" {
     display_name = "GKE ${var.cluster_name}: High Node Disk Utilization"
 
     condition_monitoring_query_language {
-      query = join("", [
-        "fetch k8s_node\n",
-        "| metric 'kubernetes.io/node/ephemeral_storage/used_bytes'\n",
-        "| filter (resource.cluster_name == '${var.cluster_name}')\n",
-        "| group_by [resource.cluster_name, resource.node_name], [used: mean(value.used_bytes)]\n",
-        "| {\n",
-        "    fetch k8s_node\n",
-        "    | metric 'kubernetes.io/node/ephemeral_storage/total_bytes'\n",
-        "    | filter (resource.cluster_name == '${var.cluster_name}')\n",
-        "    | group_by [resource.cluster_name, resource.node_name], [total: mean(value.total_bytes)]\n",
-        "}\n",
-        "| join\n",
-        "| value val(0) / val(1)\n",
-        "| condition val() > ${var.thresholds.node_disk_utilization}"
-      ])
+      query = trimspace(local.node_disk_mql)
 
       duration = var.durations.disk_duration
 
@@ -184,5 +170,10 @@ resource "google_monitoring_alert_policy" "pod_unhealthy" {
 
   alert_strategy {
     auto_close = var.alert_auto_close
+
+    # Obligatorio en alertas log-based: limita notificaciones repetidas por el mismo incidente.
+    notification_rate_limit {
+      period = "300s"
+    }
   }
 }
