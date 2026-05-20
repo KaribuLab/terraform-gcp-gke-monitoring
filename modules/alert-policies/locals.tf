@@ -103,13 +103,14 @@ locals {
     | filter (resource.cluster_name == '${var.cluster_name}')
     | {
         metric 'kubernetes.io/node/ephemeral_storage/used_bytes'
-        | group_by [resource.cluster_name, resource.node_name], [value_used: mean(value.used_bytes)]
+        | group_by [resource.cluster_name, resource.node_name], sliding(${var.durations.disk_duration}), [value_used: mean(value.used_bytes)]
       ;
         metric 'kubernetes.io/node/ephemeral_storage/total_bytes'
-        | group_by [resource.cluster_name, resource.node_name], [value_total: mean(value.total_bytes)]
+        | group_by [resource.cluster_name, resource.node_name], sliding(${var.durations.disk_duration}), [value_total: mean(value.total_bytes)]
     }
     | join
     | div
+    | every 60s
     | condition val() > ${var.thresholds.node_disk_utilization}
   EOT
 
