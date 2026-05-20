@@ -53,10 +53,11 @@ variable "notification_channels" {
 Lista de canales de notificación a crear y asociar a las alertas.
 
 Atributos por tipo:
-- email: labels.email_address (requerido)
-- slack: labels.channel_name (requerido), sensitive_labels.auth_token (requerido)
-- pagerduty: sensitive_labels.service_key (requerido)
-- webhook: labels.url (requerido), labels.username/password opcionales en sensitive_labels
+- email:             labels.email_address (requerido)
+- slack:             labels.channel_name (requerido), sensitive_labels.auth_token (requerido)
+- pagerduty:         sensitive_labels.service_key (requerido)
+- webhook:           labels.url (requerido), sensitive_labels.password (opcional) — usa webhook_basicauth
+- webhook_tokenauth: labels.url (requerido), labels.auth_token (requerido) — auth_token va en labels, NO en sensitive_labels
 EOT
   type = list(object({
     type             = string

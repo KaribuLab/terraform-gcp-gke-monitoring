@@ -23,11 +23,14 @@
 
 locals {
   # Mapeo de tipos abstractos a tipos del provider
+  # webhook_tokenauth: auth_token va en labels (campo público en la API de GCP)
+  # webhook_basicauth: username en labels, password en sensitive_labels
   channel_type_map = {
-    email     = "email"
-    slack     = "slack"
-    pagerduty = "pagerduty"
-    webhook   = "webhook_tokenauth"
+    email              = "email"
+    slack              = "slack"
+    pagerduty          = "pagerduty"
+    webhook            = "webhook_basicauth"
+    webhook_tokenauth  = "webhook_tokenauth"
   }
 
   # Indexar canales por display_name para for_each
@@ -58,12 +61,13 @@ resource "google_monitoring_notification_channel" "channels" {
   labels = each.value.labels
 
   # Labels sensibles (bloque dinámico, solo si hay valores sensibles)
+  # Campos soportados: auth_token (Slack), password (webhook), service_key (PagerDuty)
   dynamic "sensitive_labels" {
     for_each = length(each.value.sensitive_labels) > 0 ? [each.value.sensitive_labels] : []
     content {
-      auth_token   = lookup(sensitive_labels.value, "auth_token", null)
-      password     = lookup(sensitive_labels.value, "password", null)
-      service_key  = lookup(sensitive_labels.value, "service_key", null)
+      auth_token   = lookup(sensitive_labels.value, "auth_token", null)   # Para Slack
+      password     = lookup(sensitive_labels.value, "password", null)     # Para webhook_basicauth
+      service_key  = lookup(sensitive_labels.value, "service_key", null)  # Para PagerDuty
     }
   }
 
